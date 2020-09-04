@@ -1,0 +1,62 @@
+ //Inspired by: https://github.com/jenkinsci/kubernetes-plugin/blob/master/README.md#container-group-support
+podTemplate(yaml: """
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    seccomp.security.alpha.kubernetes.io/pod: runtime/default
+spec:
+  securityContext:
+    runAsUser: 1000
+    fsGroup: 1000
+  containers:
+  - name: maven
+    image: maven:3.6.2-jdk-8
+    tty: true
+    command: ['cat']
+    securityContext:
+      runAsNonRoot: true
+      readOnlyRootFilesystem: false
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop: ["NET_RAW", "DAC_OVERRIDE", "SETGID", "SETUID", "MKNOD", "NET_BIND_SERVICE", "SETFCAP", "SETPCAP", "KILL"]
+  - name: golang
+    image: golang:1.13.3
+    tty: true
+    command: ['cat']
+""") {
+
+    node(POD_LABEL) {
+        stage('Get a Maven project') {
+            git 'https://github.com/jenkins-docs/simple-java-maven-app.git'
+            container('maven') {
+                stage('Build a Maven project') {
+                    sh """
+                        mvn -B clean install
+                    """
+                }
+            }
+        }
+
+        stage('Get a Golang project') {
+            git url: 'https://github.com/golang/example.git'
+            container('golang') {
+                stage('Build a Go project') {
+                    sh """
+                    # Prepare it
+                    mkdir -p /go/src/github.com/golang
+                    ln -s `pwd` /go/src/github.com/golang/example
+                    cd /go/src/github.com/golang/example/hello
+                    export GOCACHE=/go/.cache
+                    # Build it
+                    go build hello.go
+                    
+                    # Run it
+                    ./hello
+                    """
+                }
+            }
+        }
+
+    }
+}
