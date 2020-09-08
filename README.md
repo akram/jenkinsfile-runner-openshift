@@ -8,15 +8,10 @@ Please install `yq` , an equivalent of `jq` but for yaml:
 pip3 install yq
 ```
 
+### Principles
+TBD
 
-Jenkinsfile-runner is not serving any file. So, we need to provide `remoting.jar` as the kubernetes plugin
-needs it to start jenkins agents. To make it available, we need to create a simple nginx server serving it 
-it the same `namespace`:
-
-```
-oc new-app nginx-example~https://github.com/akram/jnlpJars.git --name=remoting-jar
-```
-The url is then referenced in `kubernetes-cloud.yml` as the `jenkinsUrl: http://remoting-jar:8080`
+Jenkinsfile-runner needs kubernetes plugin and jenkins that supports JNLP4 for remoting.
 
 ## Build and run locally
 
