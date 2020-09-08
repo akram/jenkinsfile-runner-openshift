@@ -1,4 +1,5 @@
 openshift-client
+openshift-sync
 workflow-scm-step
 credentials
 workflow-job
