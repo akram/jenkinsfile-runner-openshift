@@ -4,3 +4,23 @@ jenkins:
       name: "kubernetes"
       directConnection: true
       serverUrl: "https://kubernetes.default"
+      addMasterProxyEnvVars: true
+      maxRequestsPerHostStr: "32"
+      templates:
+        slaveConnectTimeoutStr: "0"
+        serviceAccount: "jenkins"
+        yamlMergeStrategy: "override"
+      - name: openshift
+        containers:
+        - name: jnlp
+          image: 'jenkins/inbound-agent:4.3-4'
+          workingDir: "/tmp"
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+        - name: maven
+          image: 'registry.redhat.io/openshift4/ose-jenkins-agent-maven'
+          tty: true
+          command:
+          - "cat"

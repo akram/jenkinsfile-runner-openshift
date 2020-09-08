@@ -1,0 +1,31 @@
+jenkins:  
+  clouds:
+  - kubernetes:
+      addMasterProxyEnvVars: true
+      containerCapStr: "100"
+      maxRequestsPerHostStr: "32"
+      name: "openshift"
+      serverUrl: "https://kubernetes.default:443"
+      directConnection: true
+      templates:
+      - name: "maven"
+        containers:
+        - name: "maven"
+          alwaysPullImage: true
+          image: "image-registry.openshift-image-registry.svc:5000/openshift/jenkins-agent-maven:latest"
+          workingDir: "/tmp"
+        label: "maven"
+        serviceAccount: "jenkins"
+        slaveConnectTimeoutStr: "30"
+        yamlMergeStrategy: "override"
+      - name: "nodejs"
+        containers:
+        - name: "nodejs"
+          alwaysPullImage: true
+          image: "image-registry.openshift-image-registry.svc:5000/openshift/jenkins-agent-nodejs:latest"
+          workingDir: "/tmp"
+        label: "nodejs"
+        serviceAccount: "jenkins"
+        slaveConnectTimeoutStr: "30"
+        yamlMergeStrategy: "override"
+
