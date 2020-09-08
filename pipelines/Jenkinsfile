@@ -1,32 +1,23 @@
- //Inspired by: https://github.com/jenkinsci/kubernetes-plugin/blob/master/README.md#container-group-support
+#!/usr/bin/env groovy
+
 podTemplate(yaml: """
 apiVersion: v1
 kind: Pod
-metadata:
-  annotations:
-    seccomp.security.alpha.kubernetes.io/pod: runtime/default
 spec:
-  securityContext:
-    runAsUser: 1000
-    fsGroup: 1000
   containers:
   - name: maven
-    image: maven:3.6.2-jdk-8
+    image: "registry.redhat.io/openshift4/ose-jenkins-agent-maven"
     tty: true
     command: ['cat']
-    securityContext:
-      runAsNonRoot: true
-      readOnlyRootFilesystem: false
-      allowPrivilegeEscalation: false
-      capabilities:
-        drop: ["NET_RAW", "DAC_OVERRIDE", "SETGID", "SETUID", "MKNOD", "NET_BIND_SERVICE", "SETFCAP", "SETPCAP", "KILL"]
-  - name: golang
-    image: golang:1.13.3
+    workdingDir: '/tmp'
+  - name: nodejs
+    image: "registry.redhat.io/openshift4/jenkins-agent-nodejs-10-rhel7" 
     tty: true
     command: ['cat']
+    workingDir: '/tmp'
 """) {
 
-    node(POD_LABEL) {
+     node(POD_LABEL) {
         stage('Get a Maven project') {
             git 'https://github.com/jenkins-docs/simple-java-maven-app.git'
             container('maven') {

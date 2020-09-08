@@ -22,7 +22,7 @@ The url is then referenced in `kubernetes-cloud.yml` as the `jenkinsUrl: http://
 
 ```
 docker build -t jenkinsfile-runner-openshift .
-docker run --rm -v $(pwd)/Jenkinsfile:/workspace/Jenkinsfile -v $(pwd)/config:/usr/share/jenkins/ref/casc jenkinsfile-runner-openshift
+docker run --rm -v $(pwd)/pipelines/Jenkinsfile:/workspace/Jenkinsfile -v $(pwd)/config:/usr/share/jenkins/ref/casc jenkinsfile-runner-openshift
 ```
 
 
@@ -48,7 +48,7 @@ And then, run the pod:
 
 ```
 oc create configmap casc --from-file=$PWD/casc
-oc create configmap jenkinsfile --from-file=$(pwd)/Jenkinsfile
+oc create configmap jenkinsfile --from-file=$PWD/pipelines/Jenkinsfile
 
 IMAGE=$(oc get is jenkinsfile-runner-openshift   -o template='{{ .status.dockerImageRepository  }}')
 VOLUMES=$(cat << EOF
