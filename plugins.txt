@@ -1,5 +1,6 @@
 openshift-client
 openshift-sync
+openshift-login:1.0.25
 workflow-scm-step
 credentials
 workflow-job
