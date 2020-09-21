@@ -13,16 +13,7 @@ TBD
 
 Jenkinsfile-runner needs kubernetes plugin and jenkins that supports JNLP4 for remoting.
 
-## Build and run locally
-
-```
-docker build -t jenkinsfile-runner-openshift .
-docker run --rm -v $(pwd)/pipelines/Jenkinsfile:/workspace/Jenkinsfile -v $(pwd)/config:/usr/share/jenkins/ref/casc jenkinsfile-runner-openshift
-```
-
-
 ## Build and run on OpenShift
-
 
 ### Building the jenkinsfile-runner-openshift image
 ```
@@ -30,13 +21,18 @@ oc new-build . --strategy=docker --name=jenkinsfile-runner-openshift
 oc start-build jenkinsfile-runner-openshift
 ```
 
-### Running a Jenfils pipeline in OpenShift without Jenkins
+### Running a Jenkinsfile pipeline in OpenShift without Jenkins
 
 It is required that the `serviceAccount` used to run the pipeline has `edit` permissions in the current 
 namespace so it can create `pods` for the different agent we use:
 
 ```
 oc policy add-role-to-user edit -z default
+```
+
+Our demo project creates other project. So, we also need the service account to have provisioner role:
+```
+oc adm policy add-cluster-role-to-user self-provisioner system:serviceaccount:$(oc project -q):jenkins
 ```
 
 And then, run the pod:
