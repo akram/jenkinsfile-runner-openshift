@@ -1,11 +1,12 @@
 openshift-client
 openshift-sync
-openshift-login:1.0.25
+openshift-login
+configuration-as-code
 workflow-scm-step
 credentials
 workflow-job
 workflow-cps-global-lib
 workflow-support
 pipeline-model-definition
-kubernetes:1.27.1
-script-security:1.73
+kubernetes:1.27.1.1
+

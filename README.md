@@ -32,7 +32,7 @@ oc policy add-role-to-user edit -z default
 
 Our demo project creates other project. So, we also need the service account to have provisioner role:
 ```
-oc adm policy add-cluster-role-to-user self-provisioner system:serviceaccount:$(oc project -q):jenkins
+oc adm policy add-cluster-role-to-user self-provisioner system:serviceaccount:$(oc project -q):default
 ```
 
 And then, run the pod:
