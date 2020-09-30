@@ -1,3 +1,4 @@
+```
 oc new-build . --strategy=docker --name=jenkinsfile-runner-openshift
 oc policy add-role-to-user edit -z default
 oc adm policy add-cluster-role-to-user self-provisioner system:serviceaccount:$(oc project -q):default:
