@@ -8,5 +8,5 @@ workflow-job
 workflow-cps-global-lib
 workflow-support
 pipeline-model-definition
-kubernetes:1.27.1.1
+kubernetes
 
