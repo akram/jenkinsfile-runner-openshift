@@ -1,3 +1,4 @@
+kubernetes:1.28.3
 openshift-client
 openshift-sync
 openshift-login
@@ -8,5 +9,4 @@ workflow-job
 workflow-cps-global-lib
 workflow-support
 pipeline-model-definition
-kubernetes:1.27.3
 
