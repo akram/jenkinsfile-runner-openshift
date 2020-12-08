@@ -6,5 +6,5 @@ export JAVA_OPTS="${JAVA_OPTS} -Djenkins.model.Jenkins.slaveAgentPortEnforce=tru
 export JAVA_OPTS="${JAVA_OPTS} -Dhudson.slaves.NodeProvisioner.initialDelay=1" # How long to wait after startup before starting to provision nodes from clouds
 export JAVA_OPTS="${JAVA_OPTS} -Dhudson.slaves.ConnectionActivityMonitor.timeToPing=30000" # wait after startup to start checking agent connections, in milliseconds.
 
-/app/bin/jenkinsfile-runner-launcher -f /workspace/jenkinsfile/
+/app/bin/jenkinsfile-runner-launcher --file=/workspace/jenkinsfile
 

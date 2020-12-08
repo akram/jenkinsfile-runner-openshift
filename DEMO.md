@@ -12,7 +12,7 @@ spec:
     image: $IMAGE
     volumeMounts:
     - name: jenkinsfile
-      mountPath: /workspace/Jenkinsfile
+      mountPath: /workspace/jenkinsfile/Jenkinsfile
       subPath: Jenkinsfile
     - name: casc
       mountPath: /usr/share/jenkins/ref/casc
