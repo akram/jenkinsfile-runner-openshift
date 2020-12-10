@@ -1,72 +1,62 @@
 #!/usr/bin/env groovy
 import java.text.SimpleDateFormat
 
-pipeline {
-  agent { node ('maven' )  }
-  options { timeout(time: 20, unit: 'MINUTES') }
-  stages {
-    stage('raw') {
-      steps {
-        script {
-          node('maven') { container('maven') {
-            git url: 'https://github.com/akram/pipes.git'
-            sh '''
-               git clone https://github.com/akram/pipes.git
-               cd pipes
-               mvn clean package -X
-               sleep 30
-               '''
-            } }
+podTemplate( name: 'openshift', label: 'openshift-agents', showRawYaml: false, envVars: [
+    envVar(key: 'PATH', value: '/opt/rh/rh-maven35/root/usr/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin')],
+    containers: [ 
+    containerTemplate(name: 'maven', image: 'registry.redhat.io/openshift4/ose-jenkins-agent-maven', ttyEnabled: true, command: 'cat', workingDir: '/tmp'),
+    containerTemplate(name: 'nodejs', image: 'registry.redhat.io/openshift4/jenkins-agent-nodejs-10-rhel7', ttyEnabled: true, command: 'cat', workingDir: '/tmp')
+    ]) { 
+  node('openshift-agents') {
+    stage('Get a Maven project') {
+      git url: 'https://github.com/jenkins-docs/simple-java-ex.git'
+        container('maven') {
+          stage('Test Maven project') {
+            sh """
+              mvn -B test
+              """
           }
-        script {
-          node('nodejs') {
-            openshift.withCluster() {
-              def currentProject
-              openshift.withProject() {
-                currentProject = openshift.project()
+          stage('Build s2i image') {
+            openshift.raw( "new-app --build-env=MAVEN_ARGS_APPEND=-Dcom.redhat.xpaas.repo.jbossorg jboss-eap73-openshift:7.3~https://github.com/akram/simple-java-ex.git " )
+          }
+          stage('Build OpenShift Image') {
+            echo "Building OpenShift container image example"
+              script {
+                openshift.withCluster() {
+                  openshift.withProject() {
+                    openshift.selector("bc", "simple-java-ex").startBuild("--follow=true")
+                  }
+                }
+              }          
+          }       
+        }
+    }
+
+    stage('Get a simple nodejs-ex project') {
+      git url: 'https://github.com/akram/simple-nodejs-ex.git'
+        container('nodejs') {
+          stage('Build a simple nodejs app') {
+            sh """
+              npm install
+              """
+          }  
+          openshift.withCluster() {
+            openshift.withProject() {
+              currentProject = openshift.project()
                 def project = "test-" + new SimpleDateFormat("yyyy-MM-dd-HHmmss").format(new Date())
                 echo "To allow jenkins to create projects from a pipeline, the following command must be run"
                 echo "oc adm policy add-cluster-role-to-user self-provisioner system:serviceaccount:$currentProject:jenkins"
                 openshift.raw( "new-project $project" )
                 // echo "Context project is $openshift.project()"
                 // Project context has been set to the pipeline project
-  	      currentProject = project
+                currentProject = project
                 echo "openshift.raw() commands will specify $currentProject as project"
-                // but then we will forcibely specify the new-project as the project to run raw commands against
-                echo "start"
-                def result = ""
-                echo "\"adm prune deployments\", \" --keep-complete=0 --keep-failed=0 -n ${currentProject}\""
-                result = openshift.raw( "adm prune deployments", "--namespace=${currentProject} --keep-complete=0 --keep-failed=0 -n ${currentProject}")
-                echo "${result}"
-
-                echo "\"adm prune deployments\", \"-n ${currentProject}\", \" --keep-complete=0 --keep-failed=0 \""
-                result = openshift.raw( "adm prune deployments", "-n ${currentProject}", "--keep-complete=0 --keep-failed=0 -n ${currentProject}")
-                echo "${result}"
-
-                echo "\"adm prune deployments\", \" --keep-complete=0 --keep-failed=0\", \"-n ${currentProject}\""
-                result = openshift.raw( "adm prune deployments", " --keep-complete=0 --keep-failed=0", "-n ${currentProject}")
-  	      echo "${result}"
-
-                echo "\"adm prune deployments  --keep-complete=0 --keep-failed=0 -n ${currentProject}\""
-                result = openshift.raw( "adm prune deployments  --keep-complete=0 --keep-failed=0 -n ${currentProject}")
-                echo "${result}"
-
-                echo "\"adm -n ${currentProject} prune deployments  --keep-complete=0 --keep-failed=0 \""
-                result = openshift.raw( "adm -n ${currentProject} prune deployments  --keep-complete=0 --keep-failed=0")
-                echo "${result}"
-
-  	      echo "\"adm --namespace=${currentProject} prune deployments  --keep-complete=0 --keep-failed=0 \""
-                result = openshift.raw( "adm --namespace=${currentProject} prune deployments  --keep-complete=0 --keep-failed=0")
-                echo "${result}"
-
+                openshift.raw( "new-app nodejs~https://github.com/akram/simple-nodejs-ex.git" )
                 echo "end"
-              }
             }
           }
         }
-      }
     }
+
   }
 }
-                    
-
