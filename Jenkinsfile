@@ -8,30 +8,30 @@ podTemplate( name: 'openshift', label: 'openshift-agents', showRawYaml: false, e
     containerTemplate(name: 'nodejs', image: 'registry.redhat.io/openshift4/jenkins-agent-nodejs-10-rhel7', ttyEnabled: true, command: 'cat', workingDir: '/tmp')
     ]) { 
   node('openshift-agents') {
-    stage('Get a Maven project') {
-      git url: 'https://github.com/akram/simple-java-ex.git'
-        container('maven') {
+/*    stage('Get a Maven project') {
+      container('maven') {
+        git url: 'https://github.com/akram/simple-java-ex.git'
           stage('Test Maven project') {
             sh """
               mvn -B test
               """
           }
-          stage('Build s2i image') {
-            openshift.raw( "new-app --build-env=MAVEN_ARGS_APPEND=-Dcom.redhat.xpaas.repo.jbossorg jboss-eap73-openshift:7.3~https://github.com/akram/simple-java-ex.git " )
-          }
-          stage('Build OpenShift Image') {
-            echo "Building OpenShift container image example"
-              script {
-                openshift.withCluster() {
-                  openshift.withProject() {
-                    openshift.selector("bc", "simple-java-ex").startBuild("--follow=true")
-                  }
-                }
-              }          
-          }       
+        stage('Build s2i image') {
+          openshift.raw( "new-app --build-env=MAVEN_ARGS_APPEND=-Dcom.redhat.xpaas.repo.jbossorg jboss-eap73-openshift:7.3~https://github.com/akram/simple-java-ex.git " )
         }
+        stage('Build OpenShift Image') {
+          echo "Building OpenShift container image example"
+            script {
+              openshift.withCluster() {
+                openshift.withProject() {
+                  openshift.selector("bc", "simple-java-ex").startBuild("--follow=true")
+                }
+              }
+            }          
+        }       
+      }
     }
-
+*/
     stage('Get a simple nodejs-ex project') {
       git url: 'https://github.com/akram/simple-nodejs-ex.git'
         container('nodejs') {
