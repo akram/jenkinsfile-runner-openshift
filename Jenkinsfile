@@ -16,6 +16,8 @@ podTemplate( name: 'openshift', label: 'openshift-agents', showRawYaml: false, e
           sh """
             git clone https://github.com/akram/simple-java-ex.git
             cd simple-java-ex
+            env
+            export MAVEN_ARGS_APPEND=-Dcom.redhat.xpaas.repo.jbossorg
             mvn -B test
             """
         }
