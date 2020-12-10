@@ -9,7 +9,7 @@ podTemplate( name: 'openshift', label: 'openshift-agents', showRawYaml: false, e
     ]) { 
   node('openshift-agents') {
     stage('Get a Maven project') {
-      git url: 'https://github.com/jenkins-docs/simple-java-ex.git'
+      git url: 'https://github.com/akram/simple-java-ex.git'
         container('maven') {
           stage('Test Maven project') {
             sh """
