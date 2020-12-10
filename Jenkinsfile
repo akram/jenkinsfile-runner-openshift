@@ -22,7 +22,9 @@ podTemplate( name: 'openshift', label: 'openshift-agents', showRawYaml: false, e
             """
         }
         stage('Build s2i image') {
-          openshift.raw( "new-app --build-env=MAVEN_ARGS_APPEND=-Dcom.redhat.xpaas.repo.jbossorg jboss-eap73-openshift:7.3~https://github.com/akram/simple-java-ex.git " )
+          openshift.withCluster() {
+            openshift.raw( "new-app --build-env=MAVEN_ARGS_APPEND=-Dcom.redhat.xpaas.repo.jbossorg jboss-eap73-openshift:7.3~https://github.com/akram/simple-java-ex.git " )
+          }
         }
         stage('Build OpenShift Image') {
           echo "Building OpenShift container image example"
