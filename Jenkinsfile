@@ -20,7 +20,9 @@ podTemplate( name: 'openshift', cloud: 'openshift', label: 'openshift-agents', s
         }
         stage('Build nodejs s2i image') {
           openshift.withCluster() {
-            openshift.raw( "new-app nodejs~https://github.com/akram/simple-nodejs-ex.git " )
+            def created = openshift.newApp( 'nodejs~https://github.com/akram/simple-nodejs-ex.git' )
+            echo "new-app created ${created.count()} objects named: ${created.names()}"
+            //openshift.raw( "new-app nodejs~https://github.com/akram/simple-nodejs-ex.git " )
           }
         }
 
