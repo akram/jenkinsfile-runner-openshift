@@ -20,8 +20,12 @@ podTemplate( name: 'openshift', cloud: 'openshift', label: 'openshift-agents', s
         }
         stage('Build nodejs s2i image') {
           openshift.withCluster() {
-            def created = openshift.newApp( 'nodejs~https://github.com/akram/simple-nodejs-ex.git' )
-            echo "new-app created ${created.count()} objects named: ${created.names()}"
+            try {
+              def created = openshift.newApp( 'nodejs~https://github.com/akram/simple-nodejs-ex.git' )
+              echo "new-app created ${created.count()} objects named: ${created.names()}"
+            } catch ( e ) {
+              "Error encountered: ${e}"
+            }
             //openshift.raw( "new-app nodejs~https://github.com/akram/simple-nodejs-ex.git " )
           }
         }
