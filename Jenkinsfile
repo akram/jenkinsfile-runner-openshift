@@ -41,7 +41,6 @@ podTemplate( name: 'openshift', cloud: 'openshift', label: 'openshift-agents', s
               // Project context has been set to the pipeline project
               currentProject = project
               echo "openshift.raw() commands will specify $currentProject as project"
-              openshift.raw( "new-app nodejs~https://github.com/akram/simple-nodejs-ex.git" )
               echo "end"
           }
         }
