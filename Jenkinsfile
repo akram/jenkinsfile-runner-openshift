@@ -1,7 +1,7 @@
 #!/usr/bin/env groovy
 import java.text.SimpleDateFormat
 
-podTemplate( name: 'openshift', label: 'openshift-agents', showRawYaml: false, envVars: [
+podTemplate( name: 'openshift', cloud: 'openshift', label: 'openshift-agents', showRawYaml: false, envVars: [
     envVar(key: 'PATH', value: '/opt/rh/rh-maven35/root/usr/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'),
     envVar(key: 'MAVEN_ARGS_APPENDX', value: '-Dcom.redhat.xpaas.repo.jbossorg')],
     containers: [ 
