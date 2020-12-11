@@ -20,7 +20,7 @@ podTemplate( name: 'openshift', cloud: 'openshift', label: 'openshift-agents', s
         }
         stage('Build nodejs s2i image') {
           openshift.withCluster() {
-            openshift.raw( "new-app nodejshttps://github.com/akram/simple-java-ex.git " )
+            openshift.raw( "new-app nodejs~https://github.com/akram/simple-java-ex.git " )
           }
         }
 
