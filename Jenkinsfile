@@ -63,10 +63,11 @@ podTemplate( name: 'openshift', cloud: 'openshift', label: 'openshift-agents', s
         stage('Build JBoss EAP s2i image') {
           openshift.withCluster() {
             try {
+              openshift.raw( "new-app --build-env=MAVEN_ARGS_APPEND=-Dcom.redhat.xpaas.repo.jbossorg jboss-eap73-openshift:7.3~https://github.com/akram/simple-java-ex.git " );
               def created = openshift.newApp( '--build-env=MAVEN_ARGS_APPEND=-Dcom.redhat.xpaas.repo.jbossorg jboss-eap73-openshift:7.3~https://github.com/akram/simple-java-ex.git' );
               echo "new-app created ${created.count()} objects named: ${created.names()}";
             } catch ( e ) {
-              "Error encountered: ${e}";
+              echo "Error encountered: ${e}";
             }
             //openshift.raw( "new-app nodejs~https://github.com/akram/simple-nodejs-ex.git " )
             //openshift.raw( "new-app --build-env=MAVEN_ARGS_APPEND=-Dcom.redhat.xpaas.repo.jbossorg jboss-eap73-openshift:7.3~https://github.com/akram/simple-java-ex.git " )
