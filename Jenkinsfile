@@ -22,26 +22,34 @@ podTemplate( name: 'openshift', cloud: 'openshift', label: 'openshift-agents', s
           openshift.withCluster() {
             try {
               def created = openshift.newApp( 'nodejs~https://github.com/akram/simple-nodejs-ex.git' )
-              echo "new-app created ${created.count()} objects named: ${created.names()}"
+                echo "new-app created ${created.count()} objects named: ${created.names()}"
             } catch ( e ) {
               "Error encountered: ${e}"
             }
             //openshift.raw( "new-app nodejs~https://github.com/akram/simple-nodejs-ex.git " )
+            def bc = openshift.selector( "bc", "simple-nodejs-ex");
+            def buildSelector = bc.startBuild();
+            def builds = bc.related('builds');
+            builds.watch { 
+              builds.untilEach(1) {
+                return it.object().status.phase == "Complete";
+              }
+            }
           }
         }
 
         openshift.withCluster() {
           openshift.withProject() {
-            currentProject = openshift.project()
-              def project = "test-" + new SimpleDateFormat("yyyy-MM-dd-HHmmss").format(new Date())
-              echo "To allow jenkins to create projects from a pipeline, the following command must be run"
-              echo "oc adm policy add-cluster-role-to-user self-provisioner system:serviceaccount:$currentProject:jenkins"
-              openshift.raw( "new-project $project" )
-              // echo "Context project is $openshift.project()"
-              // Project context has been set to the pipeline project
-              currentProject = project
-              echo "openshift.raw() commands will specify $currentProject as project"
-              echo "end"
+            currentProject = openshift.project();
+            def project = "test-" + new SimpleDateFormat("yyyy-MM-dd-HHmmss").format(new Date());
+            echo "To allow jenkins to create projects from a pipeline, the following command must be run";
+            echo "oc adm policy add-cluster-role-to-user self-provisioner system:serviceaccount:$currentProject:jenkins";
+            openshift.raw( "new-project $project" );
+            // echo "Context project is $openshift.project()"
+            // Project context has been set to the pipeline project
+            currentProject = project;
+            echo "openshift.raw() commands will specify $currentProject as project";
+            echo "end";
           }
         }
       }
@@ -61,10 +69,10 @@ podTemplate( name: 'openshift', cloud: 'openshift', label: 'openshift-agents', s
         stage('Build JBoss EAP s2i image') {
           openshift.withCluster() {
             try {
-              def created = openshift.newApp( '--build-env=MAVEN_ARGS_APPEND=-Dcom.redhat.xpaas.repo.jbossorg jboss-eap73-openshift:7.3~https://github.com/akram/simple-java-ex.git' )
-              echo "new-app created ${created.count()} objects named: ${created.names()}"
+              def created = openshift.newApp( '--build-env=MAVEN_ARGS_APPEND=-Dcom.redhat.xpaas.repo.jbossorg jboss-eap73-openshift:7.3~https://github.com/akram/simple-java-ex.git' );
+              echo "new-app created ${created.count()} objects named: ${created.names()}";
             } catch ( e ) {
-              "Error encountered: ${e}"
+              "Error encountered: ${e}";
             }
             //openshift.raw( "new-app nodejs~https://github.com/akram/simple-nodejs-ex.git " )
             //openshift.raw( "new-app --build-env=MAVEN_ARGS_APPEND=-Dcom.redhat.xpaas.repo.jbossorg jboss-eap73-openshift:7.3~https://github.com/akram/simple-java-ex.git " )
@@ -75,7 +83,7 @@ podTemplate( name: 'openshift', cloud: 'openshift', label: 'openshift-agents', s
             script {
               openshift.withCluster() {
                 openshift.withProject() {
-                  openshift.selector("bc", "simple-java-ex").startBuild("--follow=true")
+                  openshift.selector("bc", "simple-java-ex").startBuild("--follow=true");
                 }
               }
             }
