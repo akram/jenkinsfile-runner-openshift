@@ -62,6 +62,6 @@ spec:
       name: casc
 EOF
 )
-VOLUMES_JSON=$( echo "$VOLUMES" | yq . )
+VOLUMES_JSON=$( echo "$VOLUMES" | yq eval -j )
 oc run jenkins-pipeline-run --image=$IMAGE --restart=Never  --overrides="$VOLUMES_JSON"
 ```
