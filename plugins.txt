@@ -1,4 +1,4 @@
-kubernetes:1.28.3
+kubernetes
 openshift-client
 openshift-sync
 openshift-login
