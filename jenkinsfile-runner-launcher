@@ -1,0 +1,40 @@
+#!/bin/sh
+export JAVA_OPTS="${JAVA_OPTS:+$JAVA_OPTS}"
+export JAVA_OPTS="${JAVA_OPTS} -Dhudson.TcpSlaveAgentListener.hostName=$(hostname -i)"
+export JAVA_OPTS="${JAVA_OPTS} -Djenkins.model.Jenkins.slaveAgentPort=50000"
+export JAVA_OPTS="${JAVA_OPTS} -Djenkins.model.Jenkins.slaveAgentPortEnforce=true"
+# How long to wait after startup before starting to provision nodes from clouds
+export JAVA_OPTS="${JAVA_OPTS} -Dhudson.slaves.NodeProvisioner.initialDelay=1"
+# wait after startup to start checking agent connections, in milliseconds.
+export JAVA_OPTS="${JAVA_OPTS} -Dhudson.slaves.ConnectionActivityMonitor.timeToPing=30000"
+
+#!/bin/sh
+
+if [ -n "$DEBUG" ] ; then
+  export JAVA_OPTS="-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005 $JAVA_OPTS"
+fi
+if [ -n "$JDK_11" ] ; then
+  export JAVA_OPTS="--illegal-access=permit $JAVA_OPTS"
+fi
+
+# check if the user has provided a path to the file
+if [ -z "${JENKINSFILE_PATH}" ] ; then
+  if [ -f "/workspace/Jenkinsfile" ] ; then
+    JENKINSFILE_PATH="/workspace/Jenkinsfile"
+  elif [ -f "/workspace/Jenkinsfile.yml" ] ; then
+    JENKINSFILE_PATH="/workspace/Jenkinsfile.yml"
+  else
+    # Default fallback which delegates discovery to JFR
+    JENKINSFILE_PATH=/workspace
+  fi
+fi
+
+/app/bin/jenkinsfile-runner \
+    --jenkins-war /app/jenkins \
+    --plugins /usr/share/jenkins/ref/plugins \
+    --file ${JENKINSFILE_PATH} \
+    --runWorkspace /build \
+    "$@"
+
+
+

@@ -1,12 +1,11 @@
+credentials
+configuration-as-code
 kubernetes
 openshift-client
 openshift-sync
 openshift-login
-configuration-as-code
 workflow-scm-step
-credentials
 workflow-job
 workflow-cps-global-lib
 workflow-support
 pipeline-model-definition
-
